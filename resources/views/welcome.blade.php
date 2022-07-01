@@ -25,7 +25,7 @@
 					d="m45.07 76.79 1.66 1.66a.33.33 0 0 1-.23.56H33.4a6 6 0 0 1-6-6V47.57a.33.33 0 0 0-.33-.33h-2.8a.33.33 0 0 1-.24-.56l11.12-11.12a.33.33 0 0 1 .47 0l11.11 11.12a.33.33 0 0 1-.23.56h-2.84a.34.34 0 0 0-.34.33v25a6 6 0 0 0 1.75 4.22ZM69.64 76.79l1.67 1.66a.33.33 0 0 1-.24.56H58a6 6 0 0 1-6-6V54a.34.34 0 0 0-.33-.34h-2.83a.33.33 0 0 1-.23-.56L59.72 42a.33.33 0 0 1 .47 0l11.12 11.08a.33.33 0 0 1-.24.56h-2.84a.34.34 0 0 0-.33.34v18.59a6 6 0 0 0 1.74 4.22ZM94.22 76.79l1.66 1.66a.33.33 0 0 1-.23.56H82.54a6 6 0 0 1-6-6V60.38a.33.33 0 0 0-.33-.33h-2.8a.33.33 0 0 1-.23-.57L84.3 48.37a.32.32 0 0 1 .46 0l11.12 11.11a.33.33 0 0 1-.23.57H92.8a.33.33 0 0 0-.33.33v12.19a6 6 0 0 0 1.75 4.22Z"></path>
 			</svg>
 		</div>
-		<h2 class="m-3 mx-auto text-center fw-bold">Cloudinary Generate a Video Slideshow</h2>
+		<h2 class="m-3 mx-auto text-center fw-bold">Generating a Video Slideshow</h2>
 		<p class="m-4">
 			Slideshows are the perfect addition to your media collection. They make your social media content engaging, fun and memorable and are great for business promotional purposes.
 		</p>

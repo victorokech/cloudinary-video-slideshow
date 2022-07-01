@@ -18,6 +18,15 @@
 	@endif
 	<div class="flex h-screen justify-center items-center">
 		<div class="row w-75">
+			<div class="row mt-4">
+				@foreach($this->files as $media)
+					@if ($media)
+						<div class="col-sm-3 col-md-3 mb-3">
+							<img class="card-img-top img-thumbnail img-fluid" src="{{ $media->temporaryUrl() }}" alt="Card image cap">
+						</div>
+					@endif
+				@endforeach
+			</div>
 			<div class="col-md-12">
 				<form class="mb-5" wire:submit.prevent="uploadFiles">
 					<div class="form-group row mt-5 mb-3">
@@ -38,15 +47,6 @@
 					</div>
 				</form>
 			</div>
-		</div>
-	</div>
-	<div class="container">
-		<div class="row">
-			<video width="540" height="960" controls autoplay>
-				<source src="{{ $slideshow_url }}" type="video/mp4">
-				Your browser does not support the video tag.
-			</video>
-		
 		</div>
 	</div>
 </div>

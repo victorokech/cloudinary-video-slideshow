@@ -21,12 +21,13 @@ Laravel is a PHP framework developed with developer productivity in mind. The fr
 Slideshows are the perfect addition to your media collection. They make your social media content engaging, fun and memorable and are great for business promotional purposes. In this article, we will create a video slideshow using Laravel and Cloudinary.
 
 Some use cases for slideshows include:
+
 - Creating a personalized video of a user’s recent items.
 - Creating a personalized video of items a user left in their shopping cart.
 - Creating a daily sale video of different products automatically.
 - Creating a real-estate video out of apartment images.
 
-The possibilities are endless since with dynamic transformations like Content Aware Crop you can create video slideshows for your Instagram, WhatsApp and TikTok Stories.
+The possibilities are endless since with dynamic transformations like Content-Aware Crop you can create video slideshows for your Instagram, WhatsApp and TikTok Stories.
 
 Let's get started.
 
@@ -48,35 +49,35 @@ start ensure you have Composer installed on your machine. Follow step 1 below to
 1. Install [Composer](https://getcomposer.org/) and [PHP](https://www.php.net/manual/en/install.windows.tools.php) on
    your development or production machine.
 2. Install Laravel
-    1. Via Composer:
-
-       `composer create-project --prefer-dist laravel/laravel cloudinary-video-slideshow`
-    2. Via Laravel Installer
-
-       `composer global require laravel/installer`
-
-       `laravel new cloudinary-video-slideshow`
+   
+   1. Via Composer:
+      
+      `composer create-project --prefer-dist laravel/laravel cloudinary-video-slideshow`
+   2. Via Laravel Installer
+      
+      `composer global require laravel/installer`
+      
+      `laravel new cloudinary-video-slideshow`
 3. In step 2 above we have installed the Laravel Installer and used it to scaffold a new application in the folder `cloudinary-video-slideshow`. With Laravel installed, we should be able to start and test the server ensuring everything is okay. Change the directory to the project folder and run the local development server by typing the following commands:
-
+   
    `cd cloudinary-video-slideshow`
-
+   
    `php artisan serve`
 
-The Laravel Project is now up and running. When you open `http://localhost:8000` on your computer, you should see the image below:
+The Laravel project is now up and running. When you open `http://localhost:8000` on your computer, you should see the image below:
 
 ![Laravel Server Running](https://res.cloudinary.com/dgrpkngjn/image/upload/v1655887283/watermark-api/assets/laravel-running_zqk8ol.png)
 
 ## Setting up Cloudinary’s Laravel SDK
 
-Cloudinary has a tonne of features from media upload, storage, administration, manipulation to optimization and delivery. In this article we will use Cloudinary Video Transformations to combine existing or newly uploaded media files to create a slideshow.
+Cloudinary has a tonne of features from media upload, storage, administration, manipulation to optimization and delivery. In this article, we will use Cloudinary Video Transformations to combine existing or newly uploaded media files to create a slideshow.
 
 1. Sign up for a free Cloudinary account then navigate to the Console page and take note of your Cloud name, API Key and
    API Secret.
-
+   
    ![Cloudinary Dashboard](https://res.cloudinary.com/dgrpkngjn/image/upload/v1655976836/assets/cloudinary_dashboard.png)
-
 2. Install [Cloudinary’s Laravel SDK](https://github.com/cloudinary-labs/cloudinary-laravel#installation):
-
+   
    `composer require cloudinary-labs/cloudinary-laravel`
 
 **Note**: Please ensure you follow all the steps in the #Installation section. Publish the configuration file and add
@@ -89,34 +90,36 @@ CLOUDINARY_CLOUD_NAME=YOUR_CLOUDINARY_CLOUD_NAME
 ```
 
 ## Generating a Slideshow
+
 There are two ways you can generate a slide show depending on your use case:
 
-1. Using a delivery URL - here you can use a template downloaded from Cloudinary to combine the relevant components in a delivery URL.
-2. Using the Upload API - this is the technique we will use in this article. Basically we will use the `create_slideshow` method of the Upload API. This will create a new video in your Cloudinary account based on the parameters provided.
+1. Using a delivery URL - here you can use a template downloaded from Cloudinary to combine the relevant components in a delivery URL that looks as follows:
+   `https://res.cloudinary.com/<cloudname>/video/upload/fn_render:<global-settings>;vars_(<slide-settings>(<individual-slide>))/<global-transformations>/<template>.<ext>`
+2. Using the Upload API - this is the technique we will use in this article. We will use the `create_slideshow` method of the Upload API. This will create a new video in your Cloudinary account based on the parameters provided.
 
 ## Multiple File Upload with Livewire
 
 To generate a video slideshow we will need a UI (User Interface), we will use the Laravel package Livewire to build this.
 
 1. Install Livewire Package by running the following command in your Laravel project:
-
+   
    `composer require livewire/livewire`
-
-
 2. Include Livewire scripts and styles on every page that will be using Livewire. In our case `welcome.blade.php`:
+
 ```html
 ...
     @livewireStyles
 </head>
 <body>
     ...
-    
+  
     @livewireScripts
 </body>
 </html>
 ```
-3. We will then create a Livewire Component to handle our image uploads:
 
+3. We will then create a Livewire Component to handle our image uploads:
+   
    `php artisan make:livewire MultipleFileUpload`
 
 This will create two files, first `app/Http/Livewire/MultipleFileUpload.php` and the other one
@@ -128,199 +131,370 @@ Now you can use this component anywhere in your Laravel project using the follow
 
 or
 
-`@livewire(‘image-upload’)`
+`@livewire('multiple-file-upload')`
 
 3. Open `resources/views/welcome.blade.php` and add the following code within the `<body></body>` tags as shown below:
 
 ```html
 <body class="antialiased">
   <div>
-    @livewire('image-upload')
+    @livewire('multiple-file-upload')
   </div>
 </body>
 ```
 
-This basically includes the Livewire component we created earlier into our `welcome.blade.php`.
+This includes the Livewire component we created earlier in our `welcome.blade.php`.
 
 **Note:** Please ensure you go through the [Livewire documentation](https://laravel-livewire.com/docs/2.x/quickstart), to learn how to install and set it up.
 
-3. Open the file `resources/views/livewire/image-upload.blade.php` and populate it with the following code:
+3. Open the file `resources/views/livewire/multiple-file-upload.blade.php` and populate it with the following code:
 
 ```html
-<form class="mb-5" wire:submit.prevent="upload">
-	<div class="form-group row mt-5 mb-3">
-		<div class="input-group">
-			<input type="file" class="form-control @error('media') is-invalid @enderror"
-			       placeholder="Choose file..." id="media-file" type="file" wire:model="media">
-			@error('media')
-			<div class="invalid-feedback">{{ $message }}</div>
-			@enderror
-		</div>
-		<small class="text-muted text-center mt-2" wire:loading wire:target="media">
-			{{ __('Uploading') }}&hellip;
-		</small>
-	</div>
-	<div class="text-center">
-		<button type="submit" class="btn btn-sm btn-primary w-25">
-			<i class="fas fa-check mr-1"></i> {{ __('Optimize') }}
-		</button>
-	</div>
+<form class="mb-5" wire:submit.prevent="uploadFiles">
+  <div class="form-group row mt-5 mb-3">
+    <div class="input-group">
+      <input type="file" class="form-control @error('files'|'files.*') is-invalid @enderror" placeholder="Choose files..." wire:model="files" multiple>
+	@error('files'|'files.*')
+	  <div class="invalid-feedback">{{ $message }}</div>
+	@enderror
+    </div>
+    <small class="text-muted text-center mt-2" wire:loading wire:target="files">
+      {{ __('Uploading') }}…
+    </small>
+  </div>
+  <div class="text-center">
+     <button type="submit" class="btn btn-sm btn-primary w-25">
+       {{ __('Generate Slideshow') }}
+     </button>
+   </div>
 </form>
-
-<!-- Original Image -->
-<div class="card-body">
-	<img class="card-img-top" src="{{ $media }}" alt="Original Image" width="400" height="600">
-	<h5 class="card-title mt-4 fw-bold">
-		Original Image
-	</h5>
-</div>
-
-<!-- Optimized Image -->
-<div class="card-body">
-	<img class="card-img-top" src="{{ $optimizedImage }}" alt="Optimized Image" width="400" height="600">
-	<h5 class="card-title mt-4 fw-bold">
-		Optimized Image
-	</h5>
-</div>
 ```
 
-This is our Livewire Component view, this basically will display the form and on successful optimization
-through Cloudinary will display the optimized image file.
+This is our Livewire Component view, this basically will display a form with a multiple-file input and a button.
 
-The first part of the code above is a form with an input of type file and a submit button.
-
-The second part will take the response from Cloudinary and display the non-optimized image and the optimized image from Cloudinary.
-
-**Note:** you will see the implementation in code shortly.
-
-## Understanding Image Optimization with Cloudinary
-Hold your horses, before we start coding away, we need to understand what image optimization is and specifically how to do it well with Cloudinary.
-
-### The Right Image Format
-There are several image formats with PNGs and JPEGs being some of the most popular formats. Image formats have their strengths and weaknesses like PNGs allow you to display transparent images which JPEGs cannot.
-
-As a rule of thumb we use:
-
-1. Vector Images - for simple shapes like logos, icons, texts etc
-2. Raster Images  - for complex scenes, these are basically the image formats that users upload to platforms like Instagram. They are complex photos taken from device cameras.
-
-We also have newer formats like WebP, JPEG-XR, with better encoding but are only supported in newer browsers. This makes it challenging choosing which format to send to the browser. You can take advantage of Cloudinary’s `fetch (f_)` transformation to choose and specify the format you want.
-
-For instance, you want the PNG format, you can specify the format after the underscore `f_png` as follows:
-
-`https://res.cloudinary.com/demo/image/fetch/c_scale,h_400/f_png/https://en.wikipedia.org/wiki/File:Benedict_Cumberbatch_2008.jpg`
-
-In this transformation the original image is a JPG but thanks to Cloudinary and specifying `f_png` we will get back an optimized PNG image.
-
-PNG is not the best in all scenarios, and we might need to take a more dynamic approach which will allow Cloudinary to automatically determine the best format suited for a particular browser based on its capabilities. RIP Internet Explorer. To do this we use `f_auto`:
-
-`https://res.cloudinary.com/demo/image/fetch/c_scale,h_400/f_auto/https://en.wikipedia.org/wiki/File:Benedict_Cumberbatch_2008.jpg`
-
-For more information on these transformations, check out the official [Cloudinary guide](https://cloudinary.com/documentation/image_transformations#automatic_format_selection).
-
-### Lazy Loading
-Lazy Loading Images is a set of techniques in web and application development that defer the loading of images on a page to a later point in time - when those images are actually needed, instead of loading them up front. These techniques help in improving performance, better utilization of the device’s resources, and reducing associated costs.
-
-When Lazy Loading images it is important to use the most efficient rendering method. By default, [Cloudinary](https://cloudinary.com/blog/progressive_jpegs_and_green_martians) uses progressive rendering which is one of the two ways in which to optimize images and make them display faster even on sluggish connections.
-
-We can specify this in our transformations using the transformation `fl_progressive`.
-
-### Smart Quality Optimization
-There is no standard quality and encoding setting that works for all images. Luckily Cloudinary provides a smart solution to handling image compression without compromising on visual quality. This is done using the transformation `q_auto`:
-
-`https://res.cloudinary.com/demo/image/upload/w_600/q_auto/beach_huts.jpg`
-
-Cloudinary automates the file size versus visual quality trade-off decision, on-the-fly, by using perceptual metrics and heuristics that tune the encoding settings and select the appropriate image quality based on the specific image content and format.
-
-### Serve Scaled Images
-The last pillar of core web vitals when it comes to image optimization is sizing.
-
-Web application design requires display of images in varied sizes. Delivering full size images and relying on browser-side resizing using CSS or HTML width and height attributes forces the user to render unnecessary bytes and suffer the cons of a slow loading application which is heavy on user resources like bandwidth, CPU and more.
-
-Like magic, Cloudinary swoops in to save us by providing resizing transformations. The sizing (scaling/cropping) is performed on their servers, and always delivering an image to the browser at the requested size.
-
+You will see the implementation in code shortly.
 
 ## Implementation in Code
-Enough theory lets code. We will use all the above techniques in our code.
 
-Open the file `app/Http/Livewire/ImageUpload.php`. Here, we are going to add a method that will upload an image to
-Cloudinary applying the necessary transformations for optimization, compression and resizing. Add the following code in this file.
-1. First we use Livewires `WithFileUploads` to help us with file uploads, then create two variables `$media`
+Open the file `app/Http/Livewire/MultipleFileUpload.php`. Here, we are going to add a method that will handle the multiple files selected by the user, upload them to Cloudinary and save their `public_id`'s in an array that we will use later on.
+
+Add the following code to this file.
+
+1. First, we use Livewires `WithFileUploads` to help us with file uploads, then create two variables `$media`
    and `$optimizedImage` which is an array that will contain the image URLs we get back from Cloudinary.
-    ```php
+   
+   ```php
    use Livewire\WithFileUploads;
    
-   public $media;
-   public $optimizedImage;
-    ```
-2. Secondly, we will create the upload function which will upload the image file to [Cloudinary](https://cloudinary.com) and
-   apply specific transformation which will compress, resize and optimize our images for a speedy web application.
-   ```php
-   public function upload() {
-    ...
-   }  
+   public $files = [];
+   public $slides = [];
+   
+   // Needed to specify the type of media file for our slideshow
+   public $imageExt = ['jpeg', 'jpg', 'png', 'gif',];
    ```
-3. Lets populate our method in step 2 above:
-    ```php
-    public function upload() {
-      // First we validate the input from the user
-      $data = $this->validate([
-        'media' => [
-          'required',
-          'image',
-          'mimes:jpeg,jpg,png',
-          ],
-      ]);
-      
-      /*We will now set the transformations required to optimize the images based on recommended optimization solutions*/
-      $cloud_name = env('CLOUDINARY_CLOUD_NAME', 'dgrpkngjn');
-      $folder = 'cloudinary-speed';
-      $media = $data['media'];
-      $width = '700';
-      $height = '800';
-      $quality = 'auto';
-      $fetch = 'auto';
-      $crop = 'scale';
-      
-      $optimal = cloudinary()->upload($media->getRealPath(), [
-        'folder'         => $folder,
-        'transformation' => [
-          'width'   => $width,
-          'height'  => $height,
-          'quality' => $quality,
-          'fetch_format'   => $fetch,
-          'crop'    => $crop
-          ]
-      ])->getSecurePath();
+2. Secondly, we will create the `uploadFiles` function which will upload the media files to [Cloudinary](https://cloudinary.com). We will apply specific transformations that will optimize our images for our slideshow with an aspect ratio of `9:16` which works great for most social media platforms.
    
-      $non_optimal = cloudinary()->upload($media->getRealPath(),[
-        'folder_name' => $folder   
-      ])->getSecurePath();
-                    
-      // Optimized image fetching
-      /* Fetching an optimized image applying the transformations we specified which will compress, resize and optimize our images for a speedy web application */
-      $slice = Str::afterLast($image, '/');
-      $optimized = "https://res.cloudinary.com/{$cloud_name}/image/upload/w_{$width},h_{$height},c_{$crop}/{$folder}/{$slice}";
-        
-      $this->optimizedImage = $optimized;
+   ```php
+   public function uploadFiles() {
+    ...
+   }
+   ```
+3. Let's populate our method in step 2 above:
    
-      // Non optimized version for comparison
-      $this->media = $non_optimal;
-    } 
-    ```
-   The code above will upload an image to Cloudinary and return an optimized image URL. Cloudinary automatically optimizes the image size with no compromise in quality. This is done by setting the `auto` value for the `quality` and `fetch_format` attributes. We have also specified the image width and height which will instruct Cloudinary to resize and scale the image based on these parameters.
+   ```php
+   public function uploadFiles() {
+     /* First we validate the input from the user. We will take multiple image and or video files less than 10MB in size */
+     $this->validate([
+       'files'   => [
+         'required',
+         'max:102400'
+        ],
+       'files.*' => 'mimes:jpeg,jpg,png,gif,avi,mp4,webm,mov,ogg,mkv,flv,m3u8,ts,3gp,wmv,3g2,m4v'
+     ]);
+   
+     /* We will now upload the media files to Cloudinary with specified transformations and get back the public_id */
+     foreach ($this->files as $file) {
+       $media = cloudinary()->upload($file->getRealPath(), [
+         'folder'         => 'video-slideshow',
+         'public_id'      => $file->getClientOriginalName(),
+         'transformation' => [
+           'aspect_ratio' => '9:16',
+   	'gravity'      => 'auto', //can be face, face etc
+   	'crop'         => 'fill'
+         ]
+       ])->getPublicId();
+   
+       /* Here we will check whether the file is an image or video from its extension and generate the appropriate media type parameter for the manifest_json */
+       if (in_array($file->getClientOriginalExtension(), $this->imageExt)) {
+         $this->slides[] = ['media' => 'i:'.$media];
+       } else {
+         $this->slides[] = ['media' => 'v:'.$media];
+       }
+     }
+   
+     /* Creating the manifest_json parameter */
+     $manifestJson = json_encode([
+       "w"    => 540,
+       "h"    => 960,
+       "du"   => 60,
+       "vars" => [
+         "sdur"   => 3000,
+         "tdur"   => 1500,
+         "slides" => $this->slides,
+        ],
+     ]);
+   
+     /* signingData for generating the signature  */
+     $cloudName = env('CLOUDINARY_CLOUD_NAME');
+     $timestamp = (string) Carbon::now()->unix();
+     $signingData = [
+       'timestamp'     => $timestamp,
+       'manifest_json' => $manifestJson,
+       'public_id'     => 'test_slideshow',
+       'folder'        => 'video-slideshow',
+       'notification_url' => env('CLOUDINARY_NOTIFICATION_URL')
+     ];
+     $signature = ApiUtils::signParameters($signingData, env('CLOUDINARY_API_SECRET'));
+   
+     /* Using Laravel Http Request to send a POST request to the create_slideshow end point */
+     $response = Http::post("https://api.cloudinary.com/v1_1/$cloudName/video/create_slideshow", [
+       'api_key'          => env('CLOUDINARY_API_KEY'),
+       'signature'        => $signature,
+       'timestamp'        => $timestamp,
+       'manifest_json'    => $manifestJson,
+       'resource_type'    => 'video',
+       'public_id'        => 'test_slideshow',
+       'folder'           => 'video-slideshow',
+       'notification_url' => env('CLOUDINARY_NOTIFICATION_URL')
+     ]);
+   
+     // Determine if the status code is >= 200 and < 300...
+     if ($response->successful()) {
+       session()->flash('message', 'Slideshow generated successfully!');
+     } else {
+       session()->flash('error', 'Slideshow generation failed! Try again later.');
+     }
+   }
+   ```
+   
+   The code above uploads the media files to Cloudinary returning their ` public_id`'s. Let's talk about the code.
+   
+   - ### Uploading the media files
+     
+     We will get the files from user input and upload them to Cloudinary and use their `public_id`'s to create the media type parameter `media_` which will take the form `media_i:<public_id>` for images and `media_v:<public_id>` for videos.
 
-   **Note:** There is a non optimized image for comparison.
+```
+foreach ($this->files as $file) {
+  $media = cloudinary()->upload($file->getRealPath(), [
+  'folder'         => 'video-slideshow',
+  'public_id'      => $file->getClientOriginalName(),
+  'transformation' => [
+    'aspect_ratio' => '9:16',
+    'gravity'      => 'auto', //can be face, face etc
+    'crop'         => 'fill'
+  ]])->getPublicId();
 
-If you successfully implemented the code above, you should be able to see the following when you navigate to your project on the browser:
+  if (in_array($file->getClientOriginalExtension(), $this->imageExt)) {
+    $this->slides[] = ['media' => 'i:'.$media];
+  } else {
+    $this->slides[] = ['media' => 'v:'.$media];
+  }
+}
+```
 
-![Speedy Web Apps with Cloudinary](https://res.cloudinary.com/dgrpkngjn/image/upload/v1655977607/assets/cloudinary_speed_vdsole.png)
+- ### The `manifest_json` parameter
 
-As you can see the Cloudinary Optimized Image loads faster. Don't take my word for it, you can test it out on this [demo](https://4pg3m.ciroue.com/). Just upload a super large image, less than 10 MB of course.
+The create a slideshow endpoint requires either a `manifest_transformation` or a `manifest_json`. The `manifest_json` parameter is a stringified json parameter, allowing you to define your slideshow settings in a structured data format, which then needs to be converted to a string.
 
-**Note:** Cloudinary is super powerful for the management of your media assets in your project that will not only optimize your assets for visual quality but also cost savings in terms of performance, storage, AI powered transformations as well.
+```
+$manifestJson = json_encode([
+  "w"    => 540, 
+  "h"    => 960,
+  "du"   => 60,
+  "vars" => [
+    "sdur"   => 3000,
+    "tdur"   => 1500,
+    "slides" => $this->slides,
+  ],
+]);
+```
 
-# Optimization with Cloudinary
-Cloudinary is your A to Z media management solution - upload, storage, administration, manipulation, optimization and delivery.
+You can checkout the [reference](https://cloudinary.com/documentation/video_slideshow_generation#reference) for full details on the relevant options.
+
+- ### Generating a signature
+
+Since we are sending a request to the Cloudinary API, we need to create a signature to authenticate our request. Cloudinary SDKs automatically generates this signature for any upload or admin method that requires it. However, in this case we are making a direct call to the REST API and we need to generate the signature.
+
+```
+$cloudName = env('CLOUDINARY_CLOUD_NAME');
+  $timestamp = (string) Carbon::now()->unix();
+  $signingData = [
+    'timestamp'     => $timestamp,
+    'manifest_json' => $manifestJson,
+    'public_id'     => 'test_slideshow',
+    'folder'        => 'video-slideshow',
+    'notification_url' => env('CLOUDINARY_NOTIFICATION_URL')
+  ];
+
+$signature = ApiUtils::signParameters($signingData, env('CLOUDINARY_API_SECRET'));
+```
+
+The signature is a SHA-1 or SHA-256 hexadecimal message digest created based on the following parameters:
+
+* All parameters added to the method call should be included  **except** : `file`, `cloud_name`, `resource_type` and your `api_key`.
+* Add the `timestamp` parameter.
+* Sort all the parameters in alphabetical order.
+* Separate the parameter names from their values with an `=` and join the parameter/value pairs together with an `&`.
+
+***Tip:*** We took a shortcut and used the Cloudinary SDK `ApiUtils` to create the signature:
+
+```
+$signature = ApiUtils::signParameters($signingData, env('CLOUDINARY_API_SECRET'));
+````
+
+- ### Sending the `POST` request to Cloudinary
+
+With everything ready we can send the request to Cloudinary and start the video slideshow generation. We will use Laravel's Http Request based on Guzzle.
+
+```
+$response = Http::post("https://api.cloudinary.com/v1_1/$cloudName/video/create_slideshow", [
+  'api_key'          => env('CLOUDINARY_API_KEY'),
+  'signature'        => $signature,
+  'timestamp'        => $timestamp,
+  'manifest_json'    => $manifestJson,
+  'resource_type'    => 'video',
+  'public_id'        => 'test_slideshow',
+  'folder'           => 'video-slideshow',
+  'notification_url' => env('CLOUDINARY_NOTIFICATION_URL')
+]);
+```
+
+**Note:** Once our slideshow is ready Cloudinary will send us a Webhook notification to the  `notification_url`.
+
+If you successfully implemented the code above, you should be able to see the following when you navigate to `http://localhost:8000`:
+
+![Cloudinary Video Slideshow](https://res.cloudinary.com/dgrpkngjn/image/upload/v1656670841/video-slideshow/assets/cloudinary-video-slideshow_ggzziv.png)
+
+## Handling the Webhook Notification
+
+Once we send the request successfully. Cloudinary will send us a `pending` response as it processes the generation of the video slideshow:
+
+![Cloudinary Video Slideshow Success](https://res.cloudinary.com/dgrpkngjn/image/upload/v1656673744/video-slideshow/assets/cloudinary-video-slideshow-successful-request_hiktz2.png)
+
+Cloudinary will send the following response:
+
+```
+{
+  "status": "processing",
+  "public_id": "test_slideshow",
+  "batch_id": "00b45635e533ab11e63585dd145ab7816ca19bff2bf3f298a0e66d87405ab7793"
+}
+```
+
+When the Cloudinary is done generating the slideshow it will send us a Webhook notification to the notification URL we provided in the request.
+
+```
+{
+  "notification_type": "upload",
+  "timestamp": "2021-08-11T07:44:41+00:00",
+  "request_id": "799b0f8305df4206b6d8f5dbdde0cdfc",
+  "asset_id": "640cb419bed70ef5b86e2bbe7cbb388a",
+  "public_id": "test_slideshow",
+  "version": 1628667799,
+  "version_id": "afcd9bdec6552adc43d7f316da077200",
+  "width": 500,
+  "height": 500,
+  "format": "mp4",
+  "resource_type": "video",
+  "created_at": "2021-08-11T07:43:19Z",
+  "tags": [],
+  "pages": 0,
+  "bytes": 521868,
+  "type": "upload",
+  "etag": "d7b3ecf1f5508af9fb8518158e78642f",
+  "placeholder": false,
+  "url": "http://res.cloudinary.com/demo/video/upload/v1628667799/test_slideshow.mp4",
+  "secure_url": "https://res.cloudinary.com/demo/video/upload/v1628667799/test_slideshow.mp4",
+  "access_mode": "public",
+  "audio": {},
+  "video": {
+    "pix_format": "yuv420p",
+    "codec": "h264",
+    "level": 30,
+    "profile": "High",
+    "bit_rate": "163900",
+    "time_base": "1/15360"
+  },
+  "frame_rate": 30,
+  "bit_rate": 166997,
+  "duration": 25,
+  "rotation": 0,
+  "nb_frames": 750
+}
+```
+
+We will handle this notification by creating a `WebhookController.php` by typing the following command:
+
+`php artisan make:controller WebhookController`
+
+In the file created `app/Http/Controllers/WebhookController.php` we will add the following code:
+
+```php
+public function cloudinary(Request $request) {
+  //Verification
+  $verified = SignatureVerifier::verifyNotificationSignature(json_encode($request), $request->header('X-Cld-Timestamp'), $request->header('X-Cld-Signature'));
+
+  // If the signature is verified get the secure url to our slideshow
+  if ($verified) {
+    $secureUrl = $request->secure_url;
+
+    return view('livewire.view-slideshow', ['slideshow_url' => $secureUrl]);
+  }
+
+  return response('Unverified', 401);
+}
+```
+
+***Tip:*** A webhook is a mechanism where an application can notify an other application that something has happened.
+
+When we receive the notification from Cloudinary we can notify the user by sending them an e-mail, sms or a push notification. It is really up to you but, in this case we are just returning a view and passing the slideshow URL to it.
+
+Since the notifcation from Cloudinary will be an external request we will need to allow it through the `VerifyCsrfToken.php` middleware to prevent CSRF errors.
+
+```php
+...
+  protected $except = [
+    'webhooks'
+  ];
+}
+```
+
+Next, we will create the webhook route in `routes/api.php`.
+
+```
+...
+  //webhooks client
+  Route::post('webhooks/cloudinary', [WebhookController::class, 'cloudinary']);
+````
+
+And finally update our `CLOUDINARY_NOTIFICATION_URL` in the environment variables file `.env` as follows:
+
+```
+CLOUDINARY_NOTIFICATION_URL=https://<example.com>/api/webhooks/cloudinary
+```
+
+Finally, we can enjoy our slideshow:
+
+<video width="540" height="960" controls>
+  <source src="https://res.cloudinary.com/dgrpkngjn/video/upload/v1656676242/video-slideshow/test_slideshow.mp4" type="video/mp4">
+</video>
+
+
+## Conclusion
+
+Yes, Cloudinary makes it easy to generate a slideshow and by automating and applying some transformations. This is beautiful since it allows you to focus on other things like promoting your business with the newly created slideshow.
+
+The possibilities are endless, check out Cloudinary for your A to Z media management - upload, storage, administration, manipulation, optimization and delivery.
 
 [Get started](https://cloudinary.com/signup) with Cloudinary in your Laravel projects for FREE!
+
