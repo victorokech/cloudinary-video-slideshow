@@ -283,7 +283,7 @@ Add the following code to this file.
      
      We will get the files from user input and upload them to Cloudinary and use their `public_id`'s to create the media type parameter `media_` which will take the form `media_i:<public_id>` for images and `media_v:<public_id>` for videos.
 
-```
+```php
 foreach ($this->files as $file) {
   $media = cloudinary()->upload($file->getRealPath(), [
   'folder'         => 'video-slideshow',
@@ -306,7 +306,7 @@ foreach ($this->files as $file) {
 
 The create a slideshow endpoint requires either a `manifest_transformation` or a `manifest_json`. The `manifest_json` parameter is a stringified json parameter, allowing you to define your slideshow settings in a structured data format, which then needs to be converted to a string.
 
-```
+```php
 $manifestJson = json_encode([
   "w"    => 540, 
   "h"    => 960,
@@ -325,7 +325,7 @@ You can checkout the [reference](https://cloudinary.com/documentation/video_slid
 
 Since we are sending a request to the Cloudinary API, we need to create a signature to authenticate our request. Cloudinary SDKs automatically generates this signature for any upload or admin method that requires it. However, in this case we are making a direct call to the REST API and we need to generate the signature.
 
-```
+```php
 $cloudName = env('CLOUDINARY_CLOUD_NAME');
   $timestamp = (string) Carbon::now()->unix();
   $signingData = [
@@ -348,7 +348,7 @@ The signature is a SHA-1 or SHA-256 hexadecimal message digest created based on 
 
 ***Tip:*** We took a shortcut and used the Cloudinary SDK `ApiUtils` to create the signature:
 
-```
+```php
 $signature = ApiUtils::signParameters($signingData, env('CLOUDINARY_API_SECRET'));
 ````
 
@@ -356,7 +356,7 @@ $signature = ApiUtils::signParameters($signingData, env('CLOUDINARY_API_SECRET')
 
 With everything ready we can send the request to Cloudinary and start the video slideshow generation. We will use Laravel's Http Request based on Guzzle.
 
-```
+```php
 $response = Http::post("https://api.cloudinary.com/v1_1/$cloudName/video/create_slideshow", [
   'api_key'          => env('CLOUDINARY_API_KEY'),
   'signature'        => $signature,
@@ -383,7 +383,7 @@ Once we send the request successfully. Cloudinary will send us a `pending` respo
 
 Cloudinary will send the following response:
 
-```
+```json
 {
   "status": "processing",
   "public_id": "test_slideshow",
@@ -393,7 +393,7 @@ Cloudinary will send the following response:
 
 When the Cloudinary is done generating the slideshow it will send us a Webhook notification to the notification URL we provided in the request.
 
-```
+```json
 {
   "notification_type": "upload",
   "timestamp": "2021-08-11T07:44:41+00:00",
@@ -455,7 +455,7 @@ public function cloudinary(Request $request) {
 }
 ```
 
-***Tip:*** A webhook is a mechanism where an application can notify an other application that something has happened.
+***Tip:*** A webhook is a mechanism where an application can notify another application that something has happened.
 
 When we receive the notification from Cloudinary we can notify the user by sending them an e-mail, sms or a push notification. It is really up to you but, in this case we are just returning a view and passing the slideshow URL to it.
 
@@ -471,7 +471,7 @@ Since the notifcation from Cloudinary will be an external request we will need t
 
 Next, we will create the webhook route in `routes/api.php`.
 
-```
+```php
 ...
   //webhooks client
   Route::post('webhooks/cloudinary', [WebhookController::class, 'cloudinary']);
@@ -479,15 +479,13 @@ Next, we will create the webhook route in `routes/api.php`.
 
 And finally update our `CLOUDINARY_NOTIFICATION_URL` in the environment variables file `.env` as follows:
 
-```
+```php
 CLOUDINARY_NOTIFICATION_URL=https://<example.com>/api/webhooks/cloudinary
 ```
 
 Finally, we can enjoy our slideshow:
 
-<video width="540" height="960" controls>
-  <source src="https://res.cloudinary.com/dgrpkngjn/video/upload/v1656676242/video-slideshow/test_slideshow.mp4" type="video/mp4">
-</video>
+[Video Slideshow](https://res.cloudinary.com/dgrpkngjn/video/upload/v1656676242/video-slideshow/test_slideshow.mp4)
 
 
 ## Conclusion
