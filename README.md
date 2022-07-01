@@ -7,7 +7,7 @@
 </a></p>
 
 <h1 align="center">
- Cloudinary Watermark API with Laravel
+ Creating a Video Slideshow with Cloudinary & Laravel
 </h1>
 
 Cloudinary is a Software-as-a-Service (SaaS) solution for managing all your web or mobile application’s media assets in
@@ -18,21 +18,27 @@ Laravel is a PHP framework developed with developer productivity in mind. The fr
 
 ## Introduction
 
-In this article, we’ll explore the ways you can build a simple Cloudinary Watermark API using Laravel. The API will allow you to add a watermark to an image using Cloudinary's powerful transformational API. We’ll be using Laravel 8, and all of the code is available for reference on GitHub.
+Slideshows are the perfect addition to your media collection. They make your social media content engaging, fun and memorable and are great for business promotional purposes. In this article, we will create a video slideshow using Laravel and Cloudinary.
+
+Some use cases for slideshows include:
+- Creating a personalized video of a user’s recent items.
+- Creating a personalized video of items a user left in their shopping cart.
+- Creating a daily sale video of different products automatically.
+- Creating a real-estate video out of apartment images.
+
+The possibilities are endless since with dynamic transformations like Content Aware Crop you can create video slideshows for your Instagram, WhatsApp and TikTok Stories.
+
+Let's get started.
 
 ## PHPSandbox and Github
 
-The final project can be viewed on [PHPSandbox](https://phpsandbox.io/e/x/nuopv?&layout=EditorPreview&iframeId=61ihmshq1o&theme=dark&defaultPath=/&showExplorer=no&openedFiles=/app/Http/Livewire/FileUpload.php) and the entire source code is available on my [Github](https://github.com/victorokech/cloudinary-watermark-api) repository.
+The final project can be viewed on [PHPSandbox](https://phpsandbox.io/e/x/nuopv?&layout=EditorPreview&iframeId=61ihmshq1o&theme=dark&defaultPath=/&showExplorer=no&openedFiles=/app/Http/Livewire/FileUpload.php) and the entire source code is available on my [Github](https://github.com/victorokech/cloudinary-video-slideshow) repository.
 
 ## Prerequisites
 
 Using Cloudinary in your Laravel projects is pretty straightforward. However, for you to be able to easily follow along,
 you need to have a good command of your terminal, Git and entry knowledge of PHP specifically with the Laravel
 framework.
-
-You also need to understand what a RESTful API is. REST stands for _REpresentational State Transfer_ and is an architectural style for network communication between applications, which relies on a stateless protocol (usually HTTP) for interaction.
-
-Lastly, you will need an API Client/Platform such as [Postman](https://www.postman.com/) or [Insomnia](https://insomnia.rest/) installed on your system to test the API endpoints.
 
 ## Getting Started
 
@@ -44,15 +50,15 @@ start ensure you have Composer installed on your machine. Follow step 1 below to
 2. Install Laravel
     1. Via Composer:
 
-       `composer create-project --prefer-dist laravel/laravel cloudinary-watermark-api`
+       `composer create-project --prefer-dist laravel/laravel cloudinary-video-slideshow`
     2. Via Laravel Installer
 
        `composer global require laravel/installer`
 
-       `laravel new cloudinary-watermark-api`
-3. In step 2 above we have installed the Laravel Installer and used it to scaffold a new application in the folder `cloudinary-watermark-api`. With Laravel installed, we should be able to start and test the server ensuring everything is okay. Change the directory to the project folder and run the local development server by typing the following commands:
+       `laravel new cloudinary-video-slideshow`
+3. In step 2 above we have installed the Laravel Installer and used it to scaffold a new application in the folder `cloudinary-video-slideshow`. With Laravel installed, we should be able to start and test the server ensuring everything is okay. Change the directory to the project folder and run the local development server by typing the following commands:
 
-   `cd cloudinary-watermark-api`
+   `cd cloudinary-video-slideshow`
 
    `php artisan serve`
 
@@ -60,33 +66,14 @@ The Laravel Project is now up and running. When you open `http://localhost:8000`
 
 ![Laravel Server Running](https://res.cloudinary.com/dgrpkngjn/image/upload/v1655887283/watermark-api/assets/laravel-running_zqk8ol.png)
 
-## Routes and Controllers
-In the `routes/` folder you will notice that Laravel has a couple of files. We will work with the `routes/api.php` file to create the routes we need for our API.
-
-For a start, we will need two endpoints, one to upload the watermark to Cloudinary and the other to create the watermark branded images, but you can add more routes you need as you continue exploring the Cloudinary APIs.
-
-We have a route now we need to create a controller. Run the following commands to create one.
-
-`php artisan make:controller WatermarkController`
-
-This will create the controller `app/Http/Controllers/WatermarkController.php`
-
-![WatermarkController](https://res.cloudinary.com/dgrpkngjn/image/upload/v1655887282/watermark-api/assets/watermark_controller_axuzlv.png)
-
-At the moment it is empty, but we will populate it shortly. First things first, let us setup Cloudinary 🙌🏾😊.
-
 ## Setting up Cloudinary’s Laravel SDK
 
-Cloudinary has a tonne of features from media upload, storage, administration, manipulation to optimization and delivery. In this case we will use Cloudinary's transformation features to create an API endpoint that will automatically overlay a brand/watermark image over our media.
-
-That way our media content will be authentic and super professional which is a requirement for excellent brand management
-
-To get started:
+Cloudinary has a tonne of features from media upload, storage, administration, manipulation to optimization and delivery. In this article we will use Cloudinary Video Transformations to combine existing or newly uploaded media files to create a slideshow.
 
 1. Sign up for a free Cloudinary account then navigate to the Console page and take note of your Cloud name, API Key and
    API Secret.
 
-   ![Cloudinary Dashboard](https://res.cloudinary.com/dgrpkngjn/image/upload/v1655887283/watermark-api/assets/cloudinary_dashboard_m5d8ye.png)
+   ![Cloudinary Dashboard](https://res.cloudinary.com/dgrpkngjn/image/upload/v1655976836/assets/cloudinary_dashboard.png)
 
 2. Install [Cloudinary’s Laravel SDK](https://github.com/cloudinary-labs/cloudinary-laravel#installation):
 
@@ -95,141 +82,245 @@ To get started:
 **Note**: Please ensure you follow all the steps in the #Installation section. Publish the configuration file and add
 the Cloudinary credentials you noted in Step 1 to the `.env` file.
 
-## Creating the Watermark Endpoint
-
-We will make use of the `WatermarkController` we had created earlier. It will take two required inputs from the `POST` request:
-
-1. `watermark` - This is a required image input of type PNG, since we need our watermark to be transparent in order to overlay it over other images.
-2. `public_id` - We need to implicitly provide the public id for our watermark since we will need to specify this when performing the overlay transformation later on.
-
-Open the file `app/Http/WatermarkController.php` and add the following code:
-
-1. First we create the function upload which will correspond to our `watermark/upload` end point.
-```php
-public function upload(Request $request) {
-
-}
+```
+CLOUDINARY_API_KEY=YOUR_CLOUDINARY_API_KEY
+CLOUDINARY_API_SECRET=YOUR_CLOUDINARY_API_SECRET
+CLOUDINARY_CLOUD_NAME=YOUR_CLOUDINARY_CLOUD_NAME
 ```
 
-2. Add the functionality to validate the required inputs, upload the watermark to Cloudinary and send a response to the user. Here is how it works:
-```php
-public function upload(Request $request): JsonResource {
-    // Validates the request from the user
-    // If the validation failed, throw a ValidationException and inform the user.	
-    $data = $this->validate($request, [
-        'watermark' => [
-            'required',
-            'image',
-            'mimes:png',
-        ],
-        'public_id' => [
-            'required',
-            'string'
-        ]
-    ]);
-	
-	// If there are no validation errors, proceed and upload watermark to Cloudinary and return a Json response to the user.		
-    $watermark = $data['watermark'];
-    $public_id = $data['public_id'];
-    cloudinary()->upload($watermark->getRealPath(), [
-        'folder'    => 'watermark-api',
-        'public_id' => $public_id
-    ])->getSecurePath();
-    
-    return JsonResource::make([
-        'message'   => "Watermark created successfully",
-        'watermark' => ['public_id' => $public_id]
-    ]);
-}
-```
-3. Now we can link this in the routes file. Open your `routes/api.php` and add the following code:
+## Generating a Slideshow
+There are two ways you can generate a slide show depending on your use case:
 
-`Route::post('watermark/upload', [WatermarkController::class, 'upload']);`
+1. Using a delivery URL - here you can use a template downloaded from Cloudinary to combine the relevant components in a delivery URL.
+2. Using the Upload API - this is the technique we will use in this article. Basically we will use the `create_slideshow` method of the Upload API. This will create a new video in your Cloudinary account based on the parameters provided.
 
-**Testing:** You can test the route using Postman or Insomnia. Below is an example of a successful and failed response:
+## Multiple File Upload with Livewire
 
-|![Successful API Response](https://res.cloudinary.com/dgrpkngjn/image/upload/v1655895878/watermark-api/assets/api_successful_response.png) |
-|---|
-| Successful API Response |
+To generate a video slideshow we will need a UI (User Interface), we will use the Laravel package Livewire to build this.
 
-|![Failed API Response](https://res.cloudinary.com/dgrpkngjn/image/upload/v1655895361/watermark-api/assets/api_failed_response.png) |
-|---|
-| Failed API Response |
+1. Install Livewire Package by running the following command in your Laravel project:
 
-Awesome, moving on nicely.
-
-## Creating the Overlay or Branding Endpoint
-
-By now you know how to create an endpoint, this should be a breeze. We will use the same `WatermarkController` but create a new method for this endpoint.
-
-Similar to the previous endpoint this one will also take two inputs:
-
-1. `media` - This is a required image/video input. It is the media file that we want branded with our cool watermark, we created earlier.
-2. `public_id` - This is the public id of the watermark we passed to the previous endpoint. This needs to be exactly the same to the one we provided previously.
-
-In our WatermarkController add the following method:
-
-```php
-public function create(Request $request): JsonResource {
-
-}
-```
-
-We will populate the create method above with the following code:
-
-```php
-public function create(Request $request): JsonResource {
-  // Validation
-    $data = $this->validate($request, [
-        'media'     => ['required', 'image', 'max:1024'],
-        'public_id' => [
-            'required',
-            'string'
-        ]
-    ]);
-	
-    // Uploading image to Cloudinary with transformation parameters that will overlay our watermark on our image		
-    $media = $data['media'];
-    $public_id = $data['public_id'];
-    $branded = cloudinary()->upload($media->getRealPath(), [
-        'folder'         => 'watermark-api',
-        'transformation' => [
-            'overlay' => $public_id,
-            'gravity' => 'south_east', // watermark location bottom right
-            'x'       => 0.02, // 2 percent offset horizontally
-            'y'       => 0.02, // 2 percent offset vertically
-            'crop'    => 'scale',
-        ],
-    ])->getSecurePath();
-	
-    // We return a response to the user with the URL of the branded or watermarked image		
-    return JsonResource::make([
-        'message' => "Watermark created successfully",
-        'url'     => $branded
-    ]);
-}
-```
-
-**Important:** Take note of the following transformation that make the magic happen. Please refer to this [Cloudinary Layers documentation](https://cloudinary.com/documentation/layers) to learn more about these transformation options and experiment with several other awesome features:
-1. `overlay` - This is the public id of the watermark we uploaded earlier. Please note that since we provided a `folder_name` when uploading the watermark. We will need to include the folder name in the `public_id` input we send to the server, otherwise Cloudinary will look for the watermark in the root folder and not find it.
-2. `gravity` - This is where the overlay will be placed. it can be center, north, south, east and so on and so forth.
-3. `x` and `y` offsets - These parameters accept either integer values representing the number of pixels to adjust the overlay position in the horizontal or vertical directions, or decimal values representing a percentage-based offset relative to the containing image (e.g., 0.2 for an offset of 20%).
-
-4. Install Livewire Package by running the following command in your Laravel project:
    `composer require livewire/livewire`
 
 
-If you followed along this article keenly, you should be able to use an API client such as Postman or Insomnia to hit the endpoints to upload a watermark or create a watermarked/branded image similar to the one below:
+2. Include Livewire scripts and styles on every page that will be using Livewire. In our case `welcome.blade.php`:
+```html
+...
+    @livewireStyles
+</head>
+<body>
+    ...
+    
+    @livewireScripts
+</body>
+</html>
+```
+3. We will then create a Livewire Component to handle our image uploads:
 
-|![Cloudinary Watermarked Image](https://res.cloudinary.com/dgrpkngjn/image/upload/v1655904199/watermark-api/jnamglffdarl5pcyiujd.jpg) |
-|---|
-| Photo by Justin  Brian: https://www.pexels.com/photo/city-landscape-beach-water-9833512/ |
+   `php artisan make:livewire MultipleFileUpload`
+
+This will create two files, first `app/Http/Livewire/MultipleFileUpload.php` and the other one
+in `resources/views/livewire/multiple-file-upload.blade.php`
+
+Now you can use this component anywhere in your Laravel project using the following snippet:
+
+`<livewire:multiple-file-upload/>`
+
+or
+
+`@livewire(‘image-upload’)`
+
+3. Open `resources/views/welcome.blade.php` and add the following code within the `<body></body>` tags as shown below:
+
+```html
+<body class="antialiased">
+  <div>
+    @livewire('image-upload')
+  </div>
+</body>
+```
+
+This basically includes the Livewire component we created earlier into our `welcome.blade.php`.
+
+**Note:** Please ensure you go through the [Livewire documentation](https://laravel-livewire.com/docs/2.x/quickstart), to learn how to install and set it up.
+
+3. Open the file `resources/views/livewire/image-upload.blade.php` and populate it with the following code:
+
+```html
+<form class="mb-5" wire:submit.prevent="upload">
+	<div class="form-group row mt-5 mb-3">
+		<div class="input-group">
+			<input type="file" class="form-control @error('media') is-invalid @enderror"
+			       placeholder="Choose file..." id="media-file" type="file" wire:model="media">
+			@error('media')
+			<div class="invalid-feedback">{{ $message }}</div>
+			@enderror
+		</div>
+		<small class="text-muted text-center mt-2" wire:loading wire:target="media">
+			{{ __('Uploading') }}&hellip;
+		</small>
+	</div>
+	<div class="text-center">
+		<button type="submit" class="btn btn-sm btn-primary w-25">
+			<i class="fas fa-check mr-1"></i> {{ __('Optimize') }}
+		</button>
+	</div>
+</form>
+
+<!-- Original Image -->
+<div class="card-body">
+	<img class="card-img-top" src="{{ $media }}" alt="Original Image" width="400" height="600">
+	<h5 class="card-title mt-4 fw-bold">
+		Original Image
+	</h5>
+</div>
+
+<!-- Optimized Image -->
+<div class="card-body">
+	<img class="card-img-top" src="{{ $optimizedImage }}" alt="Optimized Image" width="400" height="600">
+	<h5 class="card-title mt-4 fw-bold">
+		Optimized Image
+	</h5>
+</div>
+```
+
+This is our Livewire Component view, this basically will display the form and on successful optimization
+through Cloudinary will display the optimized image file.
+
+The first part of the code above is a form with an input of type file and a submit button.
+
+The second part will take the response from Cloudinary and display the non-optimized image and the optimized image from Cloudinary.
+
+**Note:** you will see the implementation in code shortly.
+
+## Understanding Image Optimization with Cloudinary
+Hold your horses, before we start coding away, we need to understand what image optimization is and specifically how to do it well with Cloudinary.
+
+### The Right Image Format
+There are several image formats with PNGs and JPEGs being some of the most popular formats. Image formats have their strengths and weaknesses like PNGs allow you to display transparent images which JPEGs cannot.
+
+As a rule of thumb we use:
+
+1. Vector Images - for simple shapes like logos, icons, texts etc
+2. Raster Images  - for complex scenes, these are basically the image formats that users upload to platforms like Instagram. They are complex photos taken from device cameras.
+
+We also have newer formats like WebP, JPEG-XR, with better encoding but are only supported in newer browsers. This makes it challenging choosing which format to send to the browser. You can take advantage of Cloudinary’s `fetch (f_)` transformation to choose and specify the format you want.
+
+For instance, you want the PNG format, you can specify the format after the underscore `f_png` as follows:
+
+`https://res.cloudinary.com/demo/image/fetch/c_scale,h_400/f_png/https://en.wikipedia.org/wiki/File:Benedict_Cumberbatch_2008.jpg`
+
+In this transformation the original image is a JPG but thanks to Cloudinary and specifying `f_png` we will get back an optimized PNG image.
+
+PNG is not the best in all scenarios, and we might need to take a more dynamic approach which will allow Cloudinary to automatically determine the best format suited for a particular browser based on its capabilities. RIP Internet Explorer. To do this we use `f_auto`:
+
+`https://res.cloudinary.com/demo/image/fetch/c_scale,h_400/f_auto/https://en.wikipedia.org/wiki/File:Benedict_Cumberbatch_2008.jpg`
+
+For more information on these transformations, check out the official [Cloudinary guide](https://cloudinary.com/documentation/image_transformations#automatic_format_selection).
+
+### Lazy Loading
+Lazy Loading Images is a set of techniques in web and application development that defer the loading of images on a page to a later point in time - when those images are actually needed, instead of loading them up front. These techniques help in improving performance, better utilization of the device’s resources, and reducing associated costs.
+
+When Lazy Loading images it is important to use the most efficient rendering method. By default, [Cloudinary](https://cloudinary.com/blog/progressive_jpegs_and_green_martians) uses progressive rendering which is one of the two ways in which to optimize images and make them display faster even on sluggish connections.
+
+We can specify this in our transformations using the transformation `fl_progressive`.
+
+### Smart Quality Optimization
+There is no standard quality and encoding setting that works for all images. Luckily Cloudinary provides a smart solution to handling image compression without compromising on visual quality. This is done using the transformation `q_auto`:
+
+`https://res.cloudinary.com/demo/image/upload/w_600/q_auto/beach_huts.jpg`
+
+Cloudinary automates the file size versus visual quality trade-off decision, on-the-fly, by using perceptual metrics and heuristics that tune the encoding settings and select the appropriate image quality based on the specific image content and format.
+
+### Serve Scaled Images
+The last pillar of core web vitals when it comes to image optimization is sizing.
+
+Web application design requires display of images in varied sizes. Delivering full size images and relying on browser-side resizing using CSS or HTML width and height attributes forces the user to render unnecessary bytes and suffer the cons of a slow loading application which is heavy on user resources like bandwidth, CPU and more.
+
+Like magic, Cloudinary swoops in to save us by providing resizing transformations. The sizing (scaling/cropping) is performed on their servers, and always delivering an image to the browser at the requested size.
+
+
+## Implementation in Code
+Enough theory lets code. We will use all the above techniques in our code.
+
+Open the file `app/Http/Livewire/ImageUpload.php`. Here, we are going to add a method that will upload an image to
+Cloudinary applying the necessary transformations for optimization, compression and resizing. Add the following code in this file.
+1. First we use Livewires `WithFileUploads` to help us with file uploads, then create two variables `$media`
+   and `$optimizedImage` which is an array that will contain the image URLs we get back from Cloudinary.
+    ```php
+   use Livewire\WithFileUploads;
+   
+   public $media;
+   public $optimizedImage;
+    ```
+2. Secondly, we will create the upload function which will upload the image file to [Cloudinary](https://cloudinary.com) and
+   apply specific transformation which will compress, resize and optimize our images for a speedy web application.
+   ```php
+   public function upload() {
+    ...
+   }  
+   ```
+3. Lets populate our method in step 2 above:
+    ```php
+    public function upload() {
+      // First we validate the input from the user
+      $data = $this->validate([
+        'media' => [
+          'required',
+          'image',
+          'mimes:jpeg,jpg,png',
+          ],
+      ]);
+      
+      /*We will now set the transformations required to optimize the images based on recommended optimization solutions*/
+      $cloud_name = env('CLOUDINARY_CLOUD_NAME', 'dgrpkngjn');
+      $folder = 'cloudinary-speed';
+      $media = $data['media'];
+      $width = '700';
+      $height = '800';
+      $quality = 'auto';
+      $fetch = 'auto';
+      $crop = 'scale';
+      
+      $optimal = cloudinary()->upload($media->getRealPath(), [
+        'folder'         => $folder,
+        'transformation' => [
+          'width'   => $width,
+          'height'  => $height,
+          'quality' => $quality,
+          'fetch_format'   => $fetch,
+          'crop'    => $crop
+          ]
+      ])->getSecurePath();
+   
+      $non_optimal = cloudinary()->upload($media->getRealPath(),[
+        'folder_name' => $folder   
+      ])->getSecurePath();
+                    
+      // Optimized image fetching
+      /* Fetching an optimized image applying the transformations we specified which will compress, resize and optimize our images for a speedy web application */
+      $slice = Str::afterLast($image, '/');
+      $optimized = "https://res.cloudinary.com/{$cloud_name}/image/upload/w_{$width},h_{$height},c_{$crop}/{$folder}/{$slice}";
+        
+      $this->optimizedImage = $optimized;
+   
+      // Non optimized version for comparison
+      $this->media = $non_optimal;
+    } 
+    ```
+   The code above will upload an image to Cloudinary and return an optimized image URL. Cloudinary automatically optimizes the image size with no compromise in quality. This is done by setting the `auto` value for the `quality` and `fetch_format` attributes. We have also specified the image width and height which will instruct Cloudinary to resize and scale the image based on these parameters.
+
+   **Note:** There is a non optimized image for comparison.
+
+If you successfully implemented the code above, you should be able to see the following when you navigate to your project on the browser:
+
+![Speedy Web Apps with Cloudinary](https://res.cloudinary.com/dgrpkngjn/image/upload/v1655977607/assets/cloudinary_speed_vdsole.png)
+
+As you can see the Cloudinary Optimized Image loads faster. Don't take my word for it, you can test it out on this [demo](https://4pg3m.ciroue.com/). Just upload a super large image, less than 10 MB of course.
 
 **Note:** Cloudinary is super powerful for the management of your media assets in your project that will not only optimize your assets for visual quality but also cost savings in terms of performance, storage, AI powered transformations as well.
 
-# Excel with Cloudinary
-Building an API is a whole technical process which requires you to think about the goals, architecture, testing, scaling, security and more, but in this implementation with Cloudinary we had fun building a very simple API.
-
+# Optimization with Cloudinary
 Cloudinary is your A to Z media management solution - upload, storage, administration, manipulation, optimization and delivery.
 
 [Get started](https://cloudinary.com/signup) with Cloudinary in your Laravel projects for FREE!
