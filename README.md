@@ -33,7 +33,7 @@ Let's get started.
 
 ## PHPSandbox and Github
 
-The final project can be viewed on [PHPSandbox](https://phpsandbox.io/e/x/nuopv?&layout=EditorPreview&iframeId=61ihmshq1o&theme=dark&defaultPath=/&showExplorer=no&openedFiles=/app/Http/Livewire/FileUpload.php) and the entire source code is available on my [Github](https://github.com/victorokech/cloudinary-video-slideshow) repository.
+The final project can be viewed on [PHPSandbox](https://phpsandbox.io/e/x/itirk?layout=EditorPreview&defaultPath=%2F&theme=dark&showExplorer=no&openedFiles=/app/Http/Livewire/MultipleFileUpload.php) and the entire source code is available on my [Github](https://github.com/victorokech/cloudinary-video-slideshow) repository.
 
 ## Prerequisites
 
