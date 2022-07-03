@@ -33,7 +33,7 @@ Let's get started.
 
 ## PHPSandbox and Github
 
-The final project can be viewed on [PHPSandbox](https://phpsandbox.io/e/x/itirk?layout=EditorPreview&defaultPath=%2F&theme=dark&showExplorer=no&openedFiles=/app/Http/Livewire/MultipleFileUpload.php) and the entire source code is available on my [Github](https://github.com/victorokech/cloudinary-video-slideshow) repository.
+The final project can be viewed on [PHPSandbox](https://phpsandbox.io/e/x/myfy4?layout=EditorPreview&defaultPath=%2F&theme=dark&showExplorer=no) and the entire source code is available on my [Github](https://github.com/victorokech/cloudinary-video-slideshow) repository.
 
 ## Prerequisites
 
@@ -486,7 +486,6 @@ CLOUDINARY_NOTIFICATION_URL=https://<example.com>/api/webhooks/cloudinary
 Finally, we can enjoy our slideshow:
 
 [Video Slideshow](https://res.cloudinary.com/dgrpkngjn/video/upload/v1656676242/video-slideshow/test_slideshow.mp4)
-
 
 ## Conclusion
 
