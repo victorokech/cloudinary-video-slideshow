@@ -11,7 +11,7 @@
 </h1>
 
 Cloudinary is a Software-as-a-Service (SaaS) solution for managing all your web or mobile application’s media assets in
-the cloud. Cloudinary offers an end-to-end solution for all your image and video needs, including the upload, storage,
+the cloud. Cloudinary offers an end-to-end solution for all your image and video needs, including upload, storage,
 administration, transformation and optimized delivery.
 
 Laravel is a PHP framework developed with developer productivity in mind. The framework also aims to evolve with the web and has already incorporated several new features and ideas in the web development world—such as job queues, **API authentication** out of the box, real-time communication, and much more.
@@ -31,9 +31,9 @@ The possibilities are endless since with dynamic transformations like Content-Aw
 
 Let's get started.
 
-## PHPSandbox and Github
+## Github
 
-The final project can be viewed on [PHPSandbox](https://phpsandbox.io/e/x/myfy4?layout=EditorPreview&defaultPath=%2F&theme=dark&showExplorer=no) and the entire source code is available on my [Github](https://github.com/victorokech/cloudinary-video-slideshow) repository.
+The entire source code is available on my [Github](https://github.com/victorokech/cloudinary-video-slideshow) repository.
 
 ## Prerequisites
 
@@ -50,15 +50,15 @@ start ensure you have Composer installed on your machine. Follow step 1 below to
    your development or production machine.
 2. Install Laravel
    
-   1. Via Composer:
-      
-      `composer create-project --prefer-dist laravel/laravel cloudinary-video-slideshow`
-   2. Via Laravel Installer
-      
-      `composer global require laravel/installer`
-      
-      `laravel new cloudinary-video-slideshow`
-3. In step 2 above we have installed the Laravel Installer and used it to scaffold a new application in the folder `cloudinary-video-slideshow`. With Laravel installed, we should be able to start and test the server ensuring everything is okay. Change the directory to the project folder and run the local development server by typing the following commands:
+   a) Via Composer:
+   
+   `composer create-project --prefer-dist laravel/laravel cloudinary-video-slideshow`
+   b) Via Laravel Installer
+   
+   `composer global require laravel/installer`
+   
+   `laravel new cloudinary-video-slideshow`
+3. In step 2b above we have installed the Laravel Installer and used it to scaffold a new application in the folder `cloudinary-video-slideshow`. With Laravel installed, we should be able to start and test the server ensuring everything is okay. Change the directory to the project folder and run the local development server by typing the following commands:
    
    `cd cloudinary-video-slideshow`
    
@@ -70,7 +70,7 @@ The Laravel project is now up and running. When you open `http://localhost:8000`
 
 ## Setting up Cloudinary’s Laravel SDK
 
-Cloudinary has a tonne of features from media upload, storage, administration, manipulation to optimization and delivery. In this article, we will use Cloudinary Video Transformations to combine existing or newly uploaded media files to create a slideshow.
+Cloudinary has a tonne of features from media upload, storage, administration, and manipulation to optimization and delivery. In this article, we will use Cloudinary Video Transformations to combine existing or newly uploaded media files to create a slideshow.
 
 1. Sign up for a free Cloudinary account then navigate to the Console page and take note of your Cloud name, API Key and
    API Secret.
@@ -203,7 +203,7 @@ Add the following code to this file.
    
    ```php
    public function uploadFiles() {
-     /* First we validate the input from the user. We will take multiple image and or video files less than 10MB in size */
+     /* First we validate the input from the user. We will take multiple images and or video files less than 10MB in size */
      $this->validate([
        'files'   => [
          'required',
@@ -256,7 +256,7 @@ Add the following code to this file.
      ];
      $signature = ApiUtils::signParameters($signingData, env('CLOUDINARY_API_SECRET'));
    
-     /* Using Laravel Http Request to send a POST request to the create_slideshow end point */
+     /* Using Laravel Http Request to send a POST request to the create_slideshow endpoint */
      $response = Http::post("https://api.cloudinary.com/v1_1/$cloudName/video/create_slideshow", [
        'api_key'          => env('CLOUDINARY_API_KEY'),
        'signature'        => $signature,
@@ -304,7 +304,7 @@ foreach ($this->files as $file) {
 
 - ### The `manifest_json` parameter
 
-The create a slideshow endpoint requires either a `manifest_transformation` or a `manifest_json`. The `manifest_json` parameter is a stringified json parameter, allowing you to define your slideshow settings in a structured data format, which then needs to be converted to a string.
+The create a slideshow endpoint requires either a `manifest_transformation` or a `manifest_json`. The `manifest_json` parameter is a stringified JSON parameter, allowing you to define your slideshow settings in a structured data format, which then needs to be converted to a string.
 
 ```php
 $manifestJson = json_encode([
@@ -319,11 +319,11 @@ $manifestJson = json_encode([
 ]);
 ```
 
-You can checkout the [reference](https://cloudinary.com/documentation/video_slideshow_generation#reference) for full details on the relevant options.
+You can check out the [reference](https://cloudinary.com/documentation/video_slideshow_generation#reference) for full details on the relevant options.
 
 - ### Generating a signature
 
-Since we are sending a request to the Cloudinary API, we need to create a signature to authenticate our request. Cloudinary SDKs automatically generates this signature for any upload or admin method that requires it. However, in this case we are making a direct call to the REST API and we need to generate the signature.
+Since we are sending a request to the Cloudinary API, we need to create a signature to authenticate our request. Cloudinary SDKs automatically generate this signature for any upload or admin method that requires it. However, in this case, we are making a direct call to the REST API and we need to generate the signature.
 
 ```php
 $cloudName = env('CLOUDINARY_CLOUD_NAME');
@@ -339,7 +339,7 @@ $cloudName = env('CLOUDINARY_CLOUD_NAME');
 $signature = ApiUtils::signParameters($signingData, env('CLOUDINARY_API_SECRET'));
 ```
 
-The signature is a SHA-1 or SHA-256 hexadecimal message digest created based on the following parameters:
+The signature is an SHA-1 or SHA-256 hexadecimal message digest created based on the following parameters:
 
 * All parameters added to the method call should be included  **except** : `file`, `cloud_name`, `resource_type` and your `api_key`.
 * Add the `timestamp` parameter.
@@ -354,7 +354,7 @@ $signature = ApiUtils::signParameters($signingData, env('CLOUDINARY_API_SECRET')
 
 - ### Sending the `POST` request to Cloudinary
 
-With everything ready we can send the request to Cloudinary and start the video slideshow generation. We will use Laravel's Http Request based on Guzzle.
+With everything ready, we can send the request to Cloudinary and start the video slideshow generation. We will use Laravel's Http Request based on Guzzle.
 
 ```php
 $response = Http::post("https://api.cloudinary.com/v1_1/$cloudName/video/create_slideshow", [
@@ -391,7 +391,7 @@ Cloudinary will send the following response:
 }
 ```
 
-When the Cloudinary is done generating the slideshow it will send us a Webhook notification to the notification URL we provided in the request.
+When Cloudinary is done generating the slideshow it will send us a Webhook notification to the notification URL we provided in the request.
 
 ```json
 {
@@ -444,7 +444,7 @@ public function cloudinary(Request $request) {
   //Verification
   $verified = SignatureVerifier::verifyNotificationSignature(json_encode($request), $request->header('X-Cld-Timestamp'), $request->header('X-Cld-Signature'));
 
-  // If the signature is verified get the secure url to our slideshow
+  // If the signature is verified get the secureUrl to our slideshow
   if ($verified) {
     $secureUrl = $request->secure_url;
 
@@ -457,9 +457,9 @@ public function cloudinary(Request $request) {
 
 ***Tip:*** A webhook is a mechanism where an application can notify another application that something has happened.
 
-When we receive the notification from Cloudinary we can notify the user by sending them an e-mail, sms or a push notification. It is really up to you but, in this case we are just returning a view and passing the slideshow URL to it.
+When we receive the notification from Cloudinary we can notify the user by sending them an e-mail, SMS or push notification. It is really up to you but, in this case, we are just returning a view and passing the slideshow URL to it.
 
-Since the notifcation from Cloudinary will be an external request we will need to allow it through the `VerifyCsrfToken.php` middleware to prevent CSRF errors.
+Since the notification from Cloudinary will be an external request we will need to allow it through the `VerifyCsrfToken.php` middleware to prevent CSRF errors.
 
 ```php
 ...
@@ -477,7 +477,7 @@ Next, we will create the webhook route in `routes/api.php`.
   Route::post('webhooks/cloudinary', [WebhookController::class, 'cloudinary']);
 ````
 
-And finally update our `CLOUDINARY_NOTIFICATION_URL` in the environment variables file `.env` as follows:
+And finally, update our `CLOUDINARY_NOTIFICATION_URL` in the environment variables file `.env` as follows:
 
 ```php
 CLOUDINARY_NOTIFICATION_URL=https://<example.com>/api/webhooks/cloudinary
@@ -487,9 +487,17 @@ Finally, we can enjoy our slideshow:
 
 [Video Slideshow](https://res.cloudinary.com/dgrpkngjn/video/upload/v1656676242/video-slideshow/test_slideshow.mp4)
 
+## PHPSandbox
+
+The final project can be viewed in the code embed below or directly on [PHPSandbox](https://phpsandbox.io/e/x/2nkat?layout=Preview&defaultPath=%2F&theme=dark&showExplorer=no&openedFiles= ).
+
+<figure style="height: 500px;">
+<iframe src="https://phpsandbox.io/e/x/2nkat?&layout=Preview&iframeId=pf23l9lox0&theme=dark&defaultPath=/&showExplorer=no" style="display: block" loading="lazy" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" height="100%" width="100%"></iframe>
+</figure>
+
 ## Conclusion
 
-Yes, Cloudinary makes it easy to generate a slideshow and by automating and applying some transformations. This is beautiful since it allows you to focus on other things like promoting your business with the newly created slideshow.
+Yes, Cloudinary makes it easy to generate a slideshow by automating and applying some transformations. This is beautiful since it allows you to focus on other things like promoting your business with the newly created slideshow.
 
 The possibilities are endless, check out Cloudinary for your A to Z media management - upload, storage, administration, manipulation, optimization and delivery.
 

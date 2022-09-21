@@ -4,6 +4,7 @@
 	
 	use Carbon\Carbon;
 	use Cloudinary\Api\ApiUtils;
+	use Cloudinary\Cloudinary;
 	use Illuminate\Support\Facades\Http;
 	use Livewire\Component;
 	use Livewire\WithFileUploads;
@@ -66,6 +67,8 @@
 			];
 			$signature = ApiUtils::signParameters($signingData, env('CLOUDINARY_API_SECRET'));
 			
+			// Below response from Cloudinary for using their SDK and not the community SDK
+			// cloudinary->uploadApi->createSlideshow($options = []); //options includes manifest_json
 			$response = Http::post("https://api.cloudinary.com/v1_1/$cloudName/video/create_slideshow", [
 				'api_key'          => env('CLOUDINARY_API_KEY'),
 				'signature'        => $signature,
